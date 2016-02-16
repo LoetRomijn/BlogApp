@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+	head
+		link(rel='stylesheet', href='style.css', type = 'text/css')  
+	body
+		a(href='/') Home
+		br
+		br 
+		h1 Welcome
+		br
+		h2 Create a new user
+		br	
+		form(class= "form" name= "post" action='/register' method='post')
+			label Name
+			input(type="text" name='name' placeholder="Name" autocomplete="off")
+			label Email
+			input(type="text" name ='email' placeholder="Email" autocomplete="off")
+			input(type='submit' value='Register') 

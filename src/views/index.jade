@@ -1,0 +1,23 @@
+doctype html
+html(lang="en")
+	head
+		link(rel='stylesheet', href='style.css', type ='text/css')
+	body
+		div#bodydiv
+			h1 Awesome Blog
+			br 
+			a(href='/allPosts') All blog posts
+			br 
+			br 
+			p Tell me what you think...
+			br
+			br
+			form(class='form' name='login' action='/login' method='get')
+				input(type='submit' value='Login')
+			br 
+			form(class='form' name='register' action='/register' method='get')
+				input(type='submit' value='Register')
+			br
+			form(class='form' name='logout' action='/logout' method='get')
+				input(type='submit' value='Logout')
+
