@@ -42,7 +42,7 @@ var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, null, {
 
 // Sequelize models
 
-var User = sequelize.define('users', {
+var user = sequelize.define('users', {
 	name: {
 		type: Sequelize.TEXT,
 		allowNull: false,
@@ -52,23 +52,21 @@ var User = sequelize.define('users', {
 	password: Sequelize.TEXT,
 });
 
-var Post = sequelize.define('posts', {
+var post = sequelize.define('posts', {
 	title: Sequelize.TEXT,
 	body: Sequelize.TEXT,
 });
 
-var Comment = sequelize.define('comments', {
+var comment = sequelize.define('comments', {
 	body: Sequelize.TEXT,
 });
 
-User.hasMany(Post);
-Post.belongsTo(User);
-
-Post.hasMany(Comment);
-Comment.belongsTo(Post);
-
-User.hasMany(Comment);
-Comment.belongsTo(User);
+user.hasMany(post);
+post.belongsTo(user);
+post.hasMany(comment);
+comment.belongsTo(post);
+user.hasMany(comment);
+comment.belongsTo(user);
 
 /////////////////////////////////////////////////
 //Routes 
@@ -104,26 +102,33 @@ var id = '';
 app.get('/user/:id', function(request, response) {
 	var user = request.session.user;
 	id = request.params.id;
+
 	response.render('usersprofile', {
 		user: user
 	})
 });
 
 app.post('/login', function(request, response) {
-
-	User.findOne({
+	user.findOne({
 		where: {
 			name: request.body.name
 		}
 	}).then(function(user) {
-		if (user === undefined) {
-			response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
-		} else if (user !== null && request.body.password === user.password) {
-			console.log('Succesfully logged in as: ' + user.name);
+		if (user !== null && request.body.password === user.password) {
 			request.session.user = user;
-			response.render('userspage', {
-				user: user
-			})
+			user.createPost({
+				title: 'asdf',
+				body: 'fdsa'
+			});
+
+			request.session.user.createPost({
+				title: 'asdf2',
+				body: 'fdsa2'
+			});
+
+
+			console.log('Succesfully logged in as: ' + user.name);
+			response.redirect('/user/page')
 		} else {
 			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
 		}
@@ -133,9 +138,7 @@ app.post('/login', function(request, response) {
 });
 
 app.post('/user', function(request, response) {
-	var user = request.session.user;
-
-	User.create({
+	user.create({
 		name: request.body.name,
 		email: request.body.email,
 		password: request.body.password
@@ -148,41 +151,25 @@ app.post('/user', function(request, response) {
 });
 
 app.post('/posts/new', function(request, response) {
-	var user = request.session.user;
+	var usr = request.session.user;
 
-	Post.create({
-		userId: user.id,
-		title: request.body.title,
-		body: request.body.body
-	}).then(function(newpost) {
-		response.redirect('/posts/' + newpost.dataValues.id);
+	user.findOne({where: { id: usr.id }}).then(function(user2) {
+		user2.createPost({
+			title: request.body.title,
+			body: request.body.body
+		}).then(function(newpost) {
+			response.redirect('/posts' + newpost.dataValues.id);
+		});		
 	});
+
 });
-
-
-app.post('/comments/new', function(request, response) {
-	var user = request.session.user;
-
-
-})
 
 app.post('/posts/:id', function(request, response) {
 	var user = request.session.user;
 	id = request.params.id;
 
-	Post.findAll().then(function(posts) {
-		var data = posts.map(function(post) {
-			return {
-				title: post.dataValues.title,
-				author: post.dataValues.userId,
-				postID: post.dataValues.id
-			}
-		})
-		allPosts = data.reverse();
-	}).then(function() {
-		response.render('post', {
-			user: user
-		});
+	response.render('post', {
+		user: user
 	});
 });
 

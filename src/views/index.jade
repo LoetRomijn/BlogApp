@@ -1,23 +1,38 @@
 doctype html
 html(lang="en")
 	head
-		link(rel='stylesheet', href='style.css', type ='text/css')
+		link(rel='stylesheet', href='/style.css', type ='text/css')
 	body
 		div#bodydiv
+			a(href='/user/page') User page
 			h1 Awesome Blog
 			br 
-			a(href='/allPosts') All blog posts
 			br 
+			p Login/Register and share your thoughts...
+			br
+			h2= message
+			br
+			h3 Login
+			br
+			form(class='form' name='post' action='/login' method='post')
+				label Name
+				input(type='text' name='name' placeholder='Name' autocomplete='off')
+				label Password
+				input(type='text' name ='password' placeholder='Password' autocomplete='off')
+				input(type='submit' value='Login') 
 			br 
-			p Tell me what you think...
+			h3 Register
 			br
+			form(class= 'form' name= 'post' action='/user' method='post')
+				label Name
+				input(type='text' name='name' placeholder='Name' autocomplete='off')
+				label Email
+				input(type='text' name ='email' placeholder='Email' autocomplete='off')
+				label Password
+				input(type='text' name ='password' placeholder='Password' autocomplete='off')
+				input(type='submit' value='Register') 
 			br
-			form(class='form' name='login' action='/login' method='get')
-				input(type='submit' value='Login')
-			br 
-			form(class='form' name='register' action='/register' method='get')
-				input(type='submit' value='Register')
-			br
-			form(class='form' name='logout' action='/logout' method='get')
-				input(type='submit' value='Logout')
+
+
+
 

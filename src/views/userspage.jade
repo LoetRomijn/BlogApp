@@ -1,0 +1,25 @@
+doctype html
+html(lang="en")
+	head
+		link(rel='stylesheet', href='/style.css', type = 'text/css')  
+	body
+		div#bodydiv
+			a(href='/') Home
+			br
+			br 
+			h1 Welcome to the Awesome Blog
+			br
+			a(href='/logout') Logout
+			br 
+			a(href='/user/' + user.id) Profile
+			br 
+			h3 All posts:
+			//- each post in posts
+			//- 	li 
+			//- 		|	Title: #{post.title} 
+			//- 		br
+			//- 		br 
+			//- 		|	#{post.body}
+
+
+	
