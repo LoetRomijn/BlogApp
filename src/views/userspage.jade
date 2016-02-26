@@ -11,25 +11,25 @@ html(lang="en")
 			br
 			a(href='/logout') Logout
 			br 
-			a(href='/user/' + user.id) Profile
+			a(href='/user') Profile
 			br 
-		div#columnleft
-			h3 All posts:
-			each post in allPosts
-				li 
-					|	Title: #{post.title} 
-					|	Author: #{post.userId}
-					br
-					br 
-					|	#{post.body}
-		div#columnright
-			h3 My posts:
-			each post in ownPosts
-				li 
-					|	Title: #{post.title}
-					br
-					br 
-					|	#{post.body}
+			div#columnleft
+				h3 All posts:
+				each post in allPosts
+					li 
+						|	#[a(href="/posts/#{post.id}") #{post.title}]
+						|	Author: #{post.userId}
+						br
+						br 
+						|	#{post.body}
+			div#columnright
+				h3 My posts:
+				each post in ownPosts
+					li 
+						|	Title: #{post.title}
+						br
+						br 
+						|	#{post.body}
  
 
 	

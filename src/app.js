@@ -133,7 +133,6 @@ app.get('/user/page', function(request, response) {
 				}
 			})
 			allPosts = data.reverse();
-			console.log(allPosts);
 		}).then(User.findAll().then(function(users) {
 			var data = users.map(function(user) {
 				return {
@@ -152,7 +151,7 @@ app.get('/user/page', function(request, response) {
 			}
 		})).then(Post.findAll({
 			where: {
-				id: user.id
+				userId: user.id
 			}
 		}).then(function(posts) {
 			var moredata = posts.map(function(post) {
@@ -176,7 +175,7 @@ app.get('/user/page', function(request, response) {
 
 var id = '';
 
-app.get('/user/:id', function(request, response) {
+app.get('/user', function(request, response) {
 	var user = request.session.user;
 	id = request.params.id;
 	response.render('usersprofile', {
@@ -206,14 +205,12 @@ app.post('/login', function(request, response) {
 });
 
 app.post('/user', function(request, response) {
-	var user = request.session.user;
-
 	User.create({
 		name: request.body.name,
 		email: request.body.email,
 		password: request.body.password
 	}).then(function(result) {
-		response.redirect('/user/:id')
+		response.redirect('/user')
 	}, function(error) {
 		console.log("Name already exists: " + request.body.name);
 		response.redirect('/?message=' + encodeURIComponent("Name already exists, try something else!"));
@@ -239,16 +236,16 @@ app.post('/comments/new', function(request, response) {
 
 })
 
-app.post('/posts/:id', function(request, response) {
+app.get('/posts/:id', function(request, response) {
 	if (request.session.userid != undefined) {
-		var postID = request.params.postid;
-		Post.findById(postID)
+		var postId = request.params.id;
+		Post.findById(postId)
 			.then(function(post) {
 				User.findAll().then(function(users) {
 						var data = users.map(function(user) {
 							return {
 								name: user.dataValues.name,
-								userID: user.dataValues.id
+								userId: user.dataValues.id
 							}
 						})
 						allUsers = data;
