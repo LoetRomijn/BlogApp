@@ -3,7 +3,7 @@ html(lang="en")
 	head
 		link(rel='stylesheet', href='/style.css', type = 'text/css')  
 	body
-		div#bodydiv
+		div.bodydiv
 			a(href='/') Home
 			br
 			br 
@@ -13,13 +13,23 @@ html(lang="en")
 			br 
 			a(href='/user/' + user.id) Profile
 			br 
+		div#columnleft
 			h3 All posts:
-			//- each post in posts
-			//- 	li 
-			//- 		|	Title: #{post.title} 
-			//- 		br
-			//- 		br 
-			//- 		|	#{post.body}
-
+			each post in allPosts
+				li 
+					|	Title: #{post.title} 
+					|	Author: #{post.userId}
+					br
+					br 
+					|	#{post.body}
+		div#columnright
+			h3 My posts:
+			each post in ownPosts
+				li 
+					|	Title: #{post.title}
+					br
+					br 
+					|	#{post.body}
+ 
 
 	

@@ -6,12 +6,24 @@ body{
 	background-image: url("palmleaves.jpeg")
 }
 
-#bodydiv{
+.bodydiv{
 	background-color: white;
 	width: 80%;
 	margin: auto; 
 	padding: 20px;
 	opacity: 0.7;
+}
+
+#columnleft{
+	float: left;
+	width: 40%;
+	text-align: center;
+}
+
+#columnright{
+	float:right;
+	width: 40%;
+	text-align: center;
 }
 
 h1 {

@@ -1,5 +1,19 @@
-/////////////////////////////////////////////////
-// Blog Application NYCDA homework 
+/*/////////////////////////////////////////////////
+  Checklist:
+
+  0 register      unique username
+  0 login         errors on incorrect login data
+  0 logout		  logout display
+  O posts         posts db with userId
+  O user info     display posts (all)
+  O single post   post edit
+  		- display 1 post + all comments
+        - comments db with userId and postId
+
+
+ Blog Application NYCDA homework 
+
+/////////////////////////////////////////////////*/
 
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -12,8 +26,6 @@ var session = require('express-session');
 var app = express();
 
 app.use(express.static(__dirname + '/public'));
-// app.use(express.static(__dirname + '../public'));
-// app.use(express.static(__dirname + '../views'));
 
 app.use(bodyParser.urlencoded({
 	extended: true
@@ -93,10 +105,73 @@ app.get('/user/page', function(request, response) {
 	if (user === undefined) {
 		response.redirect('/?message=' + encodeURIComponent("Please log in to view your user page."));
 	} else {
-		response.render('userspage', {
-			user: user
-		});
-	};
+
+		// Post.findAll({
+		// 	include: [User]
+		// }).then(function(posts) {
+		// 	var data = posts.map(function(post) {
+		// 		return {
+		// 			title: post.dataValues.title,
+		// 			body: post.dataValues.body,
+		// 			author: post.dataValues.userId,
+		// 			postID: post.dataValues.id
+		// 		}
+		// 		if (post.userId === User.id) {
+		// 			post.author = User.name
+		// 		}
+		// 		console.log("result of: Messages including People");
+		// 		console.log(JSON.stringify(result, null, 2));
+		// 	});
+
+		Post.findAll().then(function(posts) {
+			var data = posts.map(function(post) {
+				return {
+					title: post.dataValues.title,
+					body: post.dataValues.body,
+					userId: post.dataValues.userId,
+					id: post.dataValues.id
+				}
+			})
+			allPosts = data.reverse();
+			console.log(allPosts);
+		}).then(User.findAll().then(function(users) {
+			var data = users.map(function(user) {
+				return {
+					name: user.dataValues.name,
+					id: user.dataValues.id
+				}
+			})
+			allUsers = data;
+		}).then(function() {
+			for (post in allPosts) {
+				for (user in allUsers) {
+					if (allPosts[post].userId === allUsers[user].id) {
+						allPosts[post].userId = allUsers[user].name
+					}
+				}
+			}
+		})).then(Post.findAll({
+			where: {
+				id: user.id
+			}
+		}).then(function(posts) {
+			var moredata = posts.map(function(post) {
+				return {
+					title: post.dataValues.title,
+					body: post.dataValues.body,
+					id: post.dataValues.id
+				}
+			})
+			ownPosts = moredata.reverse();
+			console.log(allPosts);
+		}).then(function() {
+			response.render('userspage', {
+				user: user,
+				allPosts: allPosts,
+				ownPosts: ownPosts
+			});
+		}));
+	}
 });
 
 var id = '';
@@ -121,9 +196,7 @@ app.post('/login', function(request, response) {
 		} else if (user !== null && request.body.password === user.password) {
 			console.log('Succesfully logged in as: ' + user.name);
 			request.session.user = user;
-			response.render('userspage', {
-				user: user
-			})
+			response.redirect('/user/page');
 		} else {
 			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
 		}
@@ -154,8 +227,8 @@ app.post('/posts/new', function(request, response) {
 		userId: user.id,
 		title: request.body.title,
 		body: request.body.body
-	}).then(function(newpost) {
-		response.redirect('/posts/' + newpost.dataValues.id);
+	}).then(function(result) {
+		response.redirect('/posts/:id');
 	});
 });
 
@@ -167,23 +240,53 @@ app.post('/comments/new', function(request, response) {
 })
 
 app.post('/posts/:id', function(request, response) {
-	var user = request.session.user;
-	id = request.params.id;
-
-	Post.findAll().then(function(posts) {
-		var data = posts.map(function(post) {
-			return {
-				title: post.dataValues.title,
-				author: post.dataValues.userId,
-				postID: post.dataValues.id
-			}
-		})
-		allPosts = data.reverse();
-	}).then(function() {
-		response.render('post', {
-			user: user
-		});
-	});
+	if (request.session.userid != undefined) {
+		var postID = request.params.postid;
+		Post.findById(postID)
+			.then(function(post) {
+				User.findAll().then(function(users) {
+						var data = users.map(function(user) {
+							return {
+								name: user.dataValues.name,
+								userID: user.dataValues.id
+							}
+						})
+						allUsers = data;
+					})
+					.then(function() {
+						for (user in allUsers) {
+							if (allUsers[user].userId === post.userId) {
+								post.authorname = allUsers[user].name;
+							}
+						}
+					})
+					.then(Comment.findAll({
+							where: {
+								postId: postId
+							}
+						})
+						.then(function(comments) {
+							var data = comments.map(function(comment) {
+								return {
+									body: comment.dataValues.body,
+									author: comment.dataValues.author
+								}
+							});
+							allComments = data.reverse();
+						})
+						.then(function() {
+							response.render('singlepost', {
+								postID: postID,
+								post: post,
+								allComments: allComments,
+								user: request.session.username,
+								userId: request.session.userId
+							});
+						}));
+			})
+	} else {
+		response.redirect('/');
+	}
 });
 
 
