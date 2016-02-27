@@ -1,0 +1,29 @@
+doctype html
+html(lang="en")
+	head
+		link(rel='stylesheet', href='/style.css', type = 'text/css')  
+	body
+		div.bodydiv
+			a(href='/') Home
+			br
+			a(href='/logout') Logout
+			br 
+			h1 User profile
+			br
+			h2 User info	
+			br
+			h3 Name: #{user.name}
+			h3 Email: #{user.email}
+			br
+			br
+			h2 New post
+			br
+			form(class= "form" name= "post" action='/newPost' method='post')
+				label Title
+				input(type="text" name='title' placeholder="Title" autocomplete="off")
+				label Message
+				input(type="text" name ='body' placeholder="Your message here" autocomplete="off")
+				input(type='submit' value='Post') 
+			br
+			br
+			a(href='/user/page') User page

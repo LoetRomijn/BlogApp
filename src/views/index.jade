@@ -1,0 +1,38 @@
+doctype html
+html(lang="en")
+	head
+		link(rel='stylesheet', href='/style.css', type ='text/css')
+	body
+		div.bodydiv
+			a(href='/user/page') User page
+			h1 Awesome Blog
+			br 
+			br 
+			p Login/Register and share your thoughts...
+			br
+			h2= message
+			br
+			h3 Login
+			br
+			form(class='form' name='post' action='/login' method='post')
+				label Name
+				input(type='text' name='name' placeholder='Name' autocomplete='off')
+				label Password
+				input(type='text' name ='password' placeholder='Password' autocomplete='off')
+				input(type='submit' value='Login') 
+			br 
+			h3 Register
+			br
+			form(class= 'form' name= 'post' action='/user/new' method='post')
+				label Name
+				input(type='text' name='name' placeholder='Name' autocomplete='off')
+				label Email
+				input(type='text' name ='email' placeholder='Email' autocomplete='off')
+				label Password
+				input(type='text' name ='password' placeholder='Password' autocomplete='off')
+				input(type='submit' value='Register') 
+			br
+
+
+
+

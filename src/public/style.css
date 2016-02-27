@@ -1,0 +1,77 @@
+/*CSS style for the Bulletin Board App*/
+body{
+	text-align: center;
+	margin: auto;
+	padding: 40px;
+	background-image: url("palmleaves.jpeg")
+}
+
+.bodydiv{
+	background-color: white;
+	width: 80%;
+	margin: auto; 
+	padding: 20px;
+	opacity: 0.7;
+	overflow: auto;
+}
+
+#columnleft{
+	float: left;
+	width: 40%;
+	text-align: center;
+	word-break: break-all;
+}
+
+#columnright{
+	float:right;
+	width: 40%;
+	text-align: center;
+	word-break: break-all;
+}
+
+h1 {
+	text-align: center;
+	font-style: bold;
+	font-family: Helvetica;
+	font-size: 80px;
+}
+
+h1 {
+	text-align: center;
+	font-style: bold;
+	font-family: Helvetica;
+	font-size: 50px;
+}
+h3 {
+	text-align: center;
+}
+
+p {
+	text-align: center;
+	font-style: italic;	
+	font-family: Helvetica;
+	font-size: 30px;		
+}
+
+li {							
+	display: inline-block;
+	list-style-type: none;
+	width: 350px;
+	border: 2px solid black;
+	text-align: center;
+	padding: 10px;
+	margin: 20px;
+	vertical-align: top;
+}
+
+#form {					
+	text-align: center;
+	margin: auto;
+	font-size: 30px;
+	font-family: Helvetica;
+}
+
+a{
+	color: black;
+	font-style: italic;
+}
