@@ -19,12 +19,14 @@ body{
 	float: left;
 	width: 40%;
 	text-align: center;
+	word-break: break-all;
 }
 
 #columnright{
 	float:right;
 	width: 40%;
 	text-align: center;
+	word-break: break-all;
 }
 
 h1 {
@@ -54,8 +56,7 @@ p {
 li {							
 	display: inline-block;
 	list-style-type: none;
-	width: 300px;
-	height: 300px;
+	width: 350px;
 	border: 2px solid black;
 	text-align: center;
 	padding: 10px;

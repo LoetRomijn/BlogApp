@@ -26,7 +26,7 @@ html(lang="en")
 				h3 My posts:
 				each post in ownPosts
 					li 
-						|	Title: #{post.title}
+						|	#[a(href="/posts/#{post.id}") #{post.title}]
 						br
 						br 
 						|	#{post.body}

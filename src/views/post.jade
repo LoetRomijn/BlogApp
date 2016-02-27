@@ -3,7 +3,7 @@ html(lang="en")
 	head
 		link(rel='stylesheet', href='/style.css', type = 'text/css')  
 	body
-		div#bodydiv
+		div.bodydiv
 			a(href='/') Home
 			br
 			br 
@@ -11,20 +11,20 @@ html(lang="en")
 			br
 			a(href='/logout') Logout
 			br 
-			a(href='/login') Profile
+			a(href='/user') Profile
 			br 
-			a(href='/user/:id') User Page
+			a(href='/user/page') User Page
 			br
 			br
 			h3 Title: #{post.title} 
 			br
 			br 
-			p	#{post.body}
+			p #{post.body}
 			br
 			br
 			h2 New comment
 			br
-			form(class= "form" name= "comment" action='/comments/new' method='post')
+			form(class= "form" name= "comment" action='comment/:id' method='post')
 				label Comment
 				input(type="text" name ='body' placeholder="Your comment here...please be nice" autocomplete="off")
 				input(type='submit' value='Post') 
@@ -32,6 +32,6 @@ html(lang="en")
 			br
 			h2 All comments
 			br
-			each comment in comments
+			each comment in allComments
 				li #{Comment.body} 
 	
