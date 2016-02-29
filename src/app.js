@@ -6,9 +6,6 @@
 
 var express = require('express');
 var bodyParser = require('body-parser');
-// var jade = require('jade'); // unnecessary because of express?
-// var pg = require('pg'); // unnecessary because of sequelize?
-// same for promise?
 var sequelize = require('sequelize');
 var session = require('express-session');
 
@@ -72,12 +69,16 @@ Comment.belongsTo(User);
 
 //Routes 
 
+// Homepage
+
 app.get('/', function(request, response) {
 	response.render('index', {
 		message: request.query.message,
 		user: request.session.user
 	});
 });
+
+// Logout
 
 app.get('/logout', function(request, response) {
 	request.session.destroy(function(error) {
@@ -88,29 +89,14 @@ app.get('/logout', function(request, response) {
 	});
 });
 
+// User page
+
 app.get('/user/page', function(request, response) {
 	var user = request.session.user;
+
 	if (user === undefined) {
 		response.redirect('/?message=' + encodeURIComponent("Please log in to view your user page."));
 	} else {
-
-		// Post.findAll({
-		// 	include: [User]
-		// }).then(function(posts) {
-		// 	var data = posts.map(function(post) {
-		// 		return {
-		// 			title: post.dataValues.title,
-		// 			body: post.dataValues.body,
-		// 			author: post.dataValues.userId,
-		// 			postID: post.dataValues.id
-		// 		}
-		// 		if (post.userId === User.id) {
-		// 			post.author = User.name
-		// 		}
-		// 		console.log("result of: Messages including People");
-		// 		console.log(JSON.stringify(result, null, 2));
-		// 	});
-
 		Post.findAll().then(function(posts) {
 			var data = posts.map(function(post) {
 				return {
@@ -150,7 +136,6 @@ app.get('/user/page', function(request, response) {
 				}
 			})
 			ownPosts = moredata.reverse();
-			// console.log(allPosts);
 		}).then(function() {
 			response.render('userspage', {
 				user: user,
@@ -161,6 +146,8 @@ app.get('/user/page', function(request, response) {
 	}
 });
 
+// User profile
+
 app.get('/user', function(request, response) {
 	var user = request.session.user;
 	response.render('usersprofile', {
@@ -168,12 +155,18 @@ app.get('/user', function(request, response) {
 	})
 });
 
+// Login
+
 app.post('/login', function(request, response) {
+	console.log("start login naam:" + request.body.name)
 	User.findOne({
 		where: {
 			name: request.body.name
 		}
 	}).then(function(user) {
+		console.log("in functie name: " + request.body.name)
+		console.log("in functie password: " + request.body.password)
+		console.log("in functie user.password: ")
 		if (user === undefined) {
 			response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
 		} else if (user !== null && request.body.password === user.password) {
@@ -181,56 +174,34 @@ app.post('/login', function(request, response) {
 			request.session.user = user;
 			response.redirect('/user/page');
 		} else {
-			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
+			response.redirect('/?message=' + encodeURIComponent("+Name or Password incorrect, try again!"))
 		}
 	}, function(error) {
 		response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"));
 	});
 });
 
+// New User
+
 app.post('/user/new', function(request, response) {
+	var user = request.session.user;
 	User.create({
 		name: request.body.name,
 		email: request.body.email,
 		password: request.body.password
-	}).then(function(result) {
-		response.redirect('/user/page')
+	}).then(function(user) {
+		response.redirect('/user/page');
 	}, function(error) {
-		console.log("Name already exists: " + request.body.name);
 		response.redirect('/?message=' + encodeURIComponent("Name already exists, try something else!"));
 	});
 });
 
-app.post('/comment/:id', function(request, response) {
-	var user = request.session.user.id;
-	var postId = request.params.id;
-
-	
-	console.log('comment/:id')
-	console.log(user)
-	console.log(post)
-
-	Comment.create({
-		include: [postId],
-		where: {
-			postId: postId
-		},
-
-		postId: postId,
-		userId: user.id,
-		body: request.body.body
-	}).then(function() {
-		response.redirect('/posts/' + postId);
-	});
-});
+// One Post + All Comments
 
 app.get('/posts/:id', function(request, response) {
 	if (request.session.user != undefined) {
 		var postId = request.params.id;
-		
-		console.log("posts/:id")
-		console.log(postId)
-		
+
 		Post.findById(postId)
 			.then(function(post) {
 				User.findAll().then(function(users) {
@@ -278,6 +249,35 @@ app.get('/posts/:id', function(request, response) {
 	}
 });
 
+// New comment
+
+app.post('/posts/:id', function(request, response) {
+	var user = request.session.user.id;
+	var postId = request.params.id;
+
+
+	console.log(user)
+	console.log(postId)
+
+	Comment.create({
+		include: [postId],
+		where: {
+			postId: postId
+		},
+
+		postId: request.params.id,
+		userId: request.session.user.id,
+		body: request.body.body
+	}).then(function(Comment) {
+		return {
+			Comment: Comment
+		}
+	});
+	response.redirect('/posts/' + postId);
+});
+
+// New post
+
 app.post('/newPost', function(request, response) {
 	var user = request.session.user;
 
@@ -286,7 +286,7 @@ app.post('/newPost', function(request, response) {
 		title: request.body.title,
 		body: request.body.body
 	}).then(function() {
-		response.redirect('/posts/:id');
+		response.redirect('/user/page');
 	});
 });
 
