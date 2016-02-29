@@ -2,6 +2,9 @@
 
  Blog Application NYCDA homework 
 
+ // To improve: add comments counter under posts + add date + time of posts/comments.
+
+
 /////////////////////////////////////////////////*/
 
 var express = require('express');
@@ -45,7 +48,11 @@ var User = sequelize.define('users', {
 		allowNull: false,
 		unique: true
 	},
-	email: Sequelize.TEXT,
+	email: {
+		type: Sequelize.TEXT,
+		allowNull: false,
+		unique: true
+	},
 	password: Sequelize.TEXT,
 });
 
@@ -90,6 +97,7 @@ app.get('/logout', function(request, response) {
 });
 
 // User page
+// To improve: change for-loop-model into model with Post.findAll({ include: [User]})
 
 app.get('/user/page', function(request, response) {
 	var user = request.session.user;
@@ -158,23 +166,18 @@ app.get('/user', function(request, response) {
 // Login
 
 app.post('/login', function(request, response) {
-	console.log("start login naam:" + request.body.name)
 	User.findOne({
 		where: {
 			name: request.body.name
 		}
 	}).then(function(user) {
-		console.log("in functie name: " + request.body.name)
-		console.log("in functie password: " + request.body.password)
-		console.log("in functie user.password: ")
 		if (user === undefined) {
 			response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
 		} else if (user !== null && request.body.password === user.password) {
-			console.log('Succesfully logged in as: ' + user.name);
 			request.session.user = user;
 			response.redirect('/user/page');
 		} else {
-			response.redirect('/?message=' + encodeURIComponent("+Name or Password incorrect, try again!"))
+			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
 		}
 	}, function(error) {
 		response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"));
@@ -182,6 +185,7 @@ app.post('/login', function(request, response) {
 });
 
 // New User
+// To improve: figure out how to immediately login while registering, so that user page loads without logging in first
 
 app.post('/user/new', function(request, response) {
 	var user = request.session.user;
@@ -192,16 +196,16 @@ app.post('/user/new', function(request, response) {
 	}).then(function(user) {
 		response.redirect('/user/page');
 	}, function(error) {
-		response.redirect('/?message=' + encodeURIComponent("Name already exists, try something else!"));
+		response.redirect('/?message=' + encodeURIComponent("Name or email already in use, try something else!"));
 	});
 });
 
 // One Post + All Comments
+// To improve: comments authors' are not showing names, but ID's at the moment..fix it! 
 
 app.get('/posts/:id', function(request, response) {
 	if (request.session.user != undefined) {
 		var postId = request.params.id;
-
 		Post.findById(postId)
 			.then(function(post) {
 				User.findAll().then(function(users) {
@@ -215,30 +219,41 @@ app.get('/posts/:id', function(request, response) {
 					})
 					.then(function() {
 						for (user in allUsers) {
-							if (allUsers[user].id === post.userId) {
-								post.authorname = allUsers[user].name;
+							if (allUsers[user].userId === post.id) {
+								post.author = allUsers[user].name
 							}
 						}
 					})
 					.then(Comment.findAll({
 							where: {
-								postId: post.id
+								postId: postId
 							}
 						})
 						.then(function(comments) {
 							var data = comments.map(function(comment) {
 								return {
 									body: comment.dataValues.body,
-									userId: comment.dataValues.userId
+									userId: comment.dataValues.userId,
+									id: post.dataValues.id
 								}
 							});
 							allComments = data.reverse();
-						})
-						.then(function() {
+						}).then(function() {
+							console.log("before the loop")
+							for (comment in allComments) {
+								for (user in allUsers) {
+									if (allComments[comment].userId === allUsers[user].id) {
+										allComments[comment].userId = allUsers[user].name
+									}
+								}
+							}
+						}).then(function() {
+							console.log()
 							response.render('post', {
 								postId: postId,
 								post: post,
 								allComments: allComments,
+								comment: comment,
 								user: request.session.username,
 								user: request.session.user
 							});
@@ -254,10 +269,6 @@ app.get('/posts/:id', function(request, response) {
 app.post('/posts/:id', function(request, response) {
 	var user = request.session.user.id;
 	var postId = request.params.id;
-
-
-	console.log(user)
-	console.log(postId)
 
 	Comment.create({
 		include: [postId],

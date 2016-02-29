@@ -1,17 +1,33 @@
 /*CSS style for the Bulletin Board App*/
 body{
 	text-align: center;
-	margin: auto;
-	padding: 40px;
-	background-image: url("palmleaves.jpeg")
+	background-image: url("palmleaves.jpeg");
+	margin: 0;
+	padding: 0;
 }
 
 .bodydiv{
+	z-index: 1;
+	position: fixed;
 	background-color: white;
 	width: 80%;
-	margin: auto; 
+	height:100%;
+	left: 10%;
+	right: 10%;
+	margin:;
 	padding: 20px;
 	opacity: 0.7;
+	text-align: center;
+}
+
+.bodyTextdiv{
+	z-index: 2;
+	position:relative;
+	width: 80%;
+	height: 100%;
+	margin: auto;	
+	padding: 20px;
+	text-align: center;
 	overflow: auto;
 }
 
@@ -19,59 +35,121 @@ body{
 	float: left;
 	width: 40%;
 	text-align: center;
-	word-break: break-all;
+/*	word-break: break-all;*/
 }
 
 #columnright{
 	float:right;
 	width: 40%;
 	text-align: center;
-	word-break: break-all;
+	/*word-break: break-all;*/
 }
 
 h1 {
 	text-align: center;
 	font-style: bold;
 	font-family: Helvetica;
-	font-size: 80px;
+	font-size: 60px;
 }
 
-h1 {
+h2 {
 	text-align: center;
 	font-style: bold;
 	font-family: Helvetica;
-	font-size: 50px;
+	font-size: 25px;
+	color: orange;
 }
 h3 {
 	text-align: center;
+	font-style: bold;
+	font-family: Helvetica;
 }
 
 p {
 	text-align: center;
 	font-style: italic;	
 	font-family: Helvetica;
-	font-size: 30px;		
+	font-size: 20px;		
 }
 
 li {							
 	display: inline-block;
 	list-style-type: none;
-	width: 350px;
-	border: 2px solid black;
+	width: 80%;
+	/*border: 2px solid grey;*/
+	background-color: white;
 	text-align: center;
 	padding: 10px;
 	margin: 20px;
 	vertical-align: top;
+	font-family: Helvetica;
+	font-size: 20px;
 }
 
-#form {					
+.form {		
+	font-family: Helvetica;			
 	text-align: center;
+	width: 80%;
 	margin: auto;
-	font-size: 30px;
-	font-family: Helvetica;
+}
+
+input[type=text] {
+    width: 100%;
+    padding: 5px 5px;
+    margin: 8px 0;
+    box-sizing: none;
+    text-align: center;
+}
+
+input[type=password ] {
+    width: 100%;
+    padding: 5px 5px;
+    margin: 8px 0;
+    box-sizing: none;
+    text-align: center;
+}
+
+input.message{
+	width: 100%;
+	height: 200px;
+    padding: 5px 5px;
+    margin: 8px 0;
+    box-sizing: none;
+    text-align: center;
+}
+
+input.comment{
+	width: 100%;
+	height: 100px;
+    padding: 5px 5px;
+    margin: 8px 0;
+    box-sizing: none;
+    text-align: center;
+}
+
+input[type=submit] {
+    background-color: #4CAF50;
+    border: none;
+    width: 100%;
+    color: white;
+    padding: 16px 32px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
 }
 
 a{
 	color: black;
 	font-style: italic;
+	font-family: Helvetica;
+	font-size: 20px;
+}
+
+#onePost{
+/*	border:2px solid grey;*/
+	background-color: white;
+	width: 80%;
+	text-align: center;
+	margin: auto;
+	padding:10px;
 }
