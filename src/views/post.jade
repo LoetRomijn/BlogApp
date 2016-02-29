@@ -4,6 +4,7 @@ html(lang="en")
 		link(rel='stylesheet', href='/style.css', type = 'text/css')  
 	body
 		div.bodydiv
+		div.bodyTextdiv
 			a(href='/') Home
 			br
 			br 
@@ -16,22 +17,26 @@ html(lang="en")
 			a(href='/user/page') User Page
 			br
 			br
-			h3 Title: #{post.title} 
 			br
-			br 
-			p #{post.body}
-			br
-			br
+			div#onePost
+				h3 Title: "#{post.title}" by: #{post.author}
+				br
+				br 
+				p #{post.body}
+				br
+				br
 			h2 New comment
 			br
-			form(class= "form" name= "comment" action='comment/:id' method='post')
+			form(class= "form" name= "comment" action='/posts/#{post.id}' method='post')
 				label Comment
-				input(type="text" name ='body' placeholder="Your comment here...please be nice" autocomplete="off")
+				input(class= "comment" type="text" name ='body' placeholder="Your comment here...please be nice" autocomplete="off")
 				input(type='submit' value='Post') 
 			br
 			br
 			h2 All comments
 			br
 			each comment in allComments
-				li #{Comment.body} 
-	
+				li 
+					|	Author: #{comment.userId}
+					br
+					|	#{comment.body}

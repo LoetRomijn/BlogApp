@@ -4,6 +4,7 @@ html(lang="en")
 		link(rel='stylesheet', href='/style.css', type = 'text/css')  
 	body
 		div.bodydiv
+		div.bodyTextdiv
 			a(href='/') Home
 			br
 			br 
@@ -14,7 +15,7 @@ html(lang="en")
 			a(href='/user') Profile
 			br 
 			div#columnleft
-				h3 All posts:
+				h2 All posts:
 				each post in allPosts
 					li 
 						|	#[a(href="/posts/#{post.id}") #{post.title}]
@@ -23,7 +24,7 @@ html(lang="en")
 						br 
 						|	#{post.body}
 			div#columnright
-				h3 My posts:
+				h2 My posts:
 				each post in ownPosts
 					li 
 						|	#[a(href="/posts/#{post.id}") #{post.title}]

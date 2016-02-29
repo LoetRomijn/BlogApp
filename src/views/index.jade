@@ -4,11 +4,12 @@ html(lang="en")
 		link(rel='stylesheet', href='/style.css', type ='text/css')
 	body
 		div.bodydiv
+		div.bodyTextdiv
 			a(href='/user/page') User page
 			h1 Awesome Blog
 			br 
 			br 
-			p Login/Register and share your thoughts...
+			p Login or register and share your thoughts...
 			br
 			h2= message
 			br
@@ -18,7 +19,7 @@ html(lang="en")
 				label Name
 				input(type='text' name='name' placeholder='Name' autocomplete='off')
 				label Password
-				input(type='text' name ='password' placeholder='Password' autocomplete='off')
+				input(type='password' name ='password' placeholder='Password' autocomplete='off')
 				input(type='submit' value='Login') 
 			br 
 			h3 Register
@@ -29,9 +30,9 @@ html(lang="en")
 				label Email
 				input(type='text' name ='email' placeholder='Email' autocomplete='off')
 				label Password
-				input(type='text' name ='password' placeholder='Password' autocomplete='off')
+				input(type='password' name ='password' placeholder='Password' autocomplete='off')
 				input(type='submit' value='Register') 
-			br
+				br
 
 
 
