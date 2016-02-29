@@ -1,0 +1,42 @@
+doctype html
+html(lang="en")
+	head
+		link(rel='stylesheet', href='/style.css', type = 'text/css')  
+	body
+		div.bodydiv
+		div.bodyTextdiv
+			a(href='/') Home
+			br
+			br 
+			h1 Welcome to the Awesome Blog
+			br
+			a(href='/logout') Logout
+			br 
+			a(href='/user') Profile
+			br 
+			a(href='/user/page') User Page
+			br
+			br
+			br
+			div#onePost
+				h3 Title: "#{post.title}" by: #{post.author}
+				br
+				br 
+				p #{post.body}
+				br
+				br
+			h2 New comment
+			br
+			form(class= "form" name= "comment" action='/posts/#{post.id}' method='post')
+				label Comment
+				input(class= "comment" type="text" name ='body' placeholder="Your comment here...please be nice" autocomplete="off")
+				input(type='submit' value='Post') 
+			br
+			br
+			h2 All comments
+			br
+			each comment in allComments
+				li 
+					|	Author: #{comment.userId}
+					br
+					|	#{comment.body}
