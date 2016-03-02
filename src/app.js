@@ -2,15 +2,19 @@
 
  Blog Application NYCDA homework 
 
- // To improve: add comments counter under posts + add date + time of posts/comments.
+ // To improve: add comments counter under posts 
 
-
+Check: 
+Warning: missing space before text for line 27 of jade file "/home/loet/Documents/BSSAxNYCDA/Homework/BlogApp/BlogApp/src/views/post.jade"
+Warning: missing space before text for line 45 of jade file "/home/loet/Documents/BSSAxNYCDA/Homework/BlogApp/BlogApp/src/views/post.jade"
+ 
 /////////////////////////////////////////////////*/
 
 var express = require('express');
 var bodyParser = require('body-parser');
 var sequelize = require('sequelize');
 var session = require('express-session');
+var bcrypt = require('bcrypt');
 
 var app = express();
 
@@ -59,10 +63,12 @@ var User = sequelize.define('users', {
 var Post = sequelize.define('posts', {
 	title: Sequelize.TEXT,
 	body: Sequelize.TEXT,
+	timeStamp: Sequelize.DATE,
 });
 
 var Comment = sequelize.define('comments', {
 	body: Sequelize.TEXT,
+	timeStamp: Sequelize.DATE,
 });
 
 User.hasMany(Post);
@@ -97,7 +103,6 @@ app.get('/logout', function(request, response) {
 });
 
 // User page
-// To improve: change for-loop-model into model with Post.findAll({ include: [User]})
 
 app.get('/user/page', function(request, response) {
 	var user = request.session.user;
@@ -105,52 +110,41 @@ app.get('/user/page', function(request, response) {
 	if (user === undefined) {
 		response.redirect('/?message=' + encodeURIComponent("Please log in to view your user page."));
 	} else {
-		Post.findAll().then(function(posts) {
+		Post.findAll({
+			include: [User]
+		}).then(function(posts) {
 			var data = posts.map(function(post) {
 				return {
 					title: post.dataValues.title,
 					body: post.dataValues.body,
-					userId: post.dataValues.userId,
-					id: post.dataValues.id
+					id: post.dataValues.id,
+					username: post.dataValues.user.name,
+					timeStamp: post.dataValues.timeStamp
 				}
-			})
+			});
 			allPosts = data.reverse();
-		}).then(User.findAll().then(function(users) {
-			var data = users.map(function(user) {
-				return {
-					name: user.dataValues.name,
-					id: user.dataValues.id
-				}
-			})
-			allUsers = data;
-		}).then(function() {
-			for (post in allPosts) {
-				for (user in allUsers) {
-					if (allPosts[post].userId === allUsers[user].id) {
-						allPosts[post].userId = allUsers[user].name
-					}
-				}
-			}
-		})).then(Post.findAll({
+		})
+		Post.findAll({
 			where: {
 				userId: user.id
 			}
 		}).then(function(posts) {
-			var moredata = posts.map(function(post) {
+			var moreData = posts.map(function(post) {
 				return {
 					title: post.dataValues.title,
 					body: post.dataValues.body,
-					id: post.dataValues.id
+					id: post.dataValues.id,
+					username: user.name,
+					timeStamp: post.dataValues.timeStamp
 				}
-			})
-			ownPosts = moredata.reverse();
-		}).then(function() {
+			});
+			ownPosts = moreData.reverse();
 			response.render('userspage', {
 				user: user,
 				allPosts: allPosts,
 				ownPosts: ownPosts
 			});
-		}));
+		})
 	}
 });
 
@@ -163,102 +157,111 @@ app.get('/user', function(request, response) {
 	})
 });
 
-// Login
+
+// Login   
 
 app.post('/login', function(request, response) {
+	var password = request.body.password;
 	User.findOne({
 		where: {
 			name: request.body.name
 		}
 	}).then(function(user) {
-		if (user === undefined) {
-			response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
-		} else if (user !== null && request.body.password === user.password) {
-			request.session.user = user;
-			response.redirect('/user/page');
-		} else {
-			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
-		}
-	}, function(error) {
-		response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"));
-	});
+			if (user === undefined) {
+				response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
+			}
+			if (user === null) {
+				response.redirect('/?message=' + encodeURIComponent("Please register below before logging in"));
+
+			} else if (request.body.name.length === 0) {
+				response.redirect('/?message=' + encodeURIComponent("Please enter a name"));
+			} else if (password.length === 0) {
+				response.redirect('/?message=' + encodeURIComponent("Please enter a password"));
+			} else if (user !== null && password.length !== 0) {
+				bcrypt.compare(password, user.password, function(err, passwordMatch) {
+					if (err) {
+						console.log("Error with bcrypt")
+					}
+					if (passwordMatch) {
+						request.session.user = user;
+						response.redirect('/user/page');
+					} else {
+						response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
+					}
+				})
+			}
+		},
+		function(error) {
+			response.redirect('/?message=' + encodeURIComponent("An error occurred, try logging in again or register below"));
+		});
 });
 
 // New User
-// To improve: figure out how to immediately login while registering, so that user page loads without logging in first
+// To improve: figure out how to immediately login while registering, so that user page loads without logging in first (check out flash storage?)
 
 app.post('/user/new', function(request, response) {
 	var user = request.session.user;
-	User.create({
-		name: request.body.name,
-		email: request.body.email,
-		password: request.body.password
-	}).then(function(user) {
-		response.redirect('/user/page');
-	}, function(error) {
-		response.redirect('/?message=' + encodeURIComponent("Name or email already in use, try something else!"));
+
+	bcrypt.hash(request.body.password, 8, function(err, passwordHash) {
+		if (err !== undefined) {
+			console.log(err);
+		}
+		if (request.body.name.length === 0 || request.body.email.length === 0 || request.body.password.length === 0) {
+			response.redirect('/?message=' + encodeURIComponent("Please enter a name, emailaddress and a password"));
+		} else {
+			User.create({
+				name: request.body.name,
+				email: request.body.email,
+				password: passwordHash
+			}).then(function(user) {
+					response.redirect('/user/page');
+				},
+				function(error) {
+					response.redirect('/?message=' + encodeURIComponent("Name or email already in use, try something else!"));
+				});
+		};
 	});
 });
 
 // One Post + All Comments
-// To improve: comments authors' are not showing names, but ID's at the moment..fix it! 
 
 app.get('/posts/:id', function(request, response) {
-	if (request.session.user != undefined) {
+	if (request.session.user !== undefined) {
 		var postId = request.params.id;
-		Post.findById(postId)
-			.then(function(post) {
-				User.findAll().then(function(users) {
-						var data = users.map(function(user) {
-							return {
-								name: user.dataValues.name,
-								userId: user.dataValues.id
-							}
-						})
-						allUsers = data;
-					})
-					.then(function() {
-						for (user in allUsers) {
-							if (allUsers[user].userId === post.id) {
-								post.author = allUsers[user].name
-							}
-						}
-					})
-					.then(Comment.findAll({
-							where: {
-								postId: postId
-							}
-						})
-						.then(function(comments) {
-							var data = comments.map(function(comment) {
-								return {
-									body: comment.dataValues.body,
-									userId: comment.dataValues.userId,
-									id: post.dataValues.id
-								}
-							});
-							allComments = data.reverse();
-						}).then(function() {
-							console.log("before the loop")
-							for (comment in allComments) {
-								for (user in allUsers) {
-									if (allComments[comment].userId === allUsers[user].id) {
-										allComments[comment].userId = allUsers[user].name
-									}
-								}
-							}
-						}).then(function() {
-							console.log()
-							response.render('post', {
-								postId: postId,
-								post: post,
-								allComments: allComments,
-								comment: comment,
-								user: request.session.username,
-								user: request.session.user
-							});
-						}));
+		Post.findAll({
+			include: [User],
+			where: {
+				id: postId
+			}
+		}).then(function(posts) {
+			var onePost = posts.map(function(post) {
+				return {
+					title: post.dataValues.title,
+					body: post.dataValues.body,
+					id: post.dataValues.id,
+					username: post.dataValues.user.name,
+					timeStamp: post.dataValues.timeStamp
+				}
+			});
+			Comment.findAll({
+				include: [User],
+				where: {
+					postId: postId
+				}
+			}).then(function(comments) {
+				var allComments = comments.map(function(comment) {
+					return {
+						username: comment.dataValues.user.name,
+						body: comment.dataValues.body,
+						timeStamp: comment.dataValues.timeStamp
+					}
+				});
+				response.render('post', {
+					onePost: onePost[0],
+					allComments: allComments
+				});
 			})
+		})
 	} else {
 		response.redirect('/');
 	}
@@ -278,7 +281,8 @@ app.post('/posts/:id', function(request, response) {
 
 		postId: request.params.id,
 		userId: request.session.user.id,
-		body: request.body.body
+		body: request.body.body,
+		timeStamp: new Date()
 	}).then(function(Comment) {
 		return {
 			Comment: Comment
@@ -295,13 +299,14 @@ app.post('/newPost', function(request, response) {
 	Post.create({
 		userId: user.id,
 		title: request.body.title,
-		body: request.body.body
+		body: request.body.body,
+		timeStamp: new Date()
 	}).then(function() {
 		response.redirect('/user/page');
 	});
 });
 
-// sync database, then start server 
+// Sync database, then start server 
 
 sequelize.sync().then(function() {
 	var server = app.listen(3000, function() {

@@ -19,15 +19,16 @@ html(lang="en")
 			br
 			br
 			div#onePost
-				h3 Title: "#{post.title}" by: #{post.author}
+				h3 Title: "#{onePost.title}" by: #{onePost.username}
 				br
 				br 
-				p #{post.body}
+				p #{onePost.body}
 				br
+				p#date	#{onePost.timeStamp}
 				br
 			h2 New comment
 			br
-			form(class= "form" name= "comment" action='/posts/#{post.id}' method='post')
+			form(class= "form" name= "comment" action='/posts/#{onePost.id}' method='post')
 				label Comment
 				input(class= "comment" type="text" name ='body' placeholder="Your comment here...please be nice" autocomplete="off")
 				input(type='submit' value='Post') 
@@ -37,6 +38,8 @@ html(lang="en")
 			br
 			each comment in allComments
 				li 
-					|	Author: #{comment.userId}
+					|	Author: #{comment.username}
 					br
 					|	#{comment.body}
+					br
+					p#date	#{comment.timeStamp}
