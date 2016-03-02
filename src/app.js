@@ -2,7 +2,7 @@
 
  Blog Application NYCDA homework 
 
- // To improve: add comments counter under posts + add date + time of posts/comments.
+ // To improve: add comments counter under posts + add date + time of posts/comments. Encrypt passwords 
 
 
 /////////////////////////////////////////////////*/
@@ -11,6 +11,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var sequelize = require('sequelize');
 var session = require('express-session');
+var bcrypt = require('bcrypt');
 
 var app = express();
 
@@ -163,40 +164,65 @@ app.get('/user', function(request, response) {
 	})
 });
 
-// Login
+// Login   
 
 app.post('/login', function(request, response) {
+	var password = request.body.password;
 	User.findOne({
 		where: {
 			name: request.body.name
 		}
+
 	}).then(function(user) {
-		if (user === undefined) {
-			response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
-		} else if (user !== null && request.body.password === user.password) {
-			request.session.user = user;
-			response.redirect('/user/page');
-		} else {
-			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
-		}
-	}, function(error) {
-		response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"));
-	});
+			if (user === undefined) {
+				response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
+			} else if (request.body.name.length === 0) {
+				response.redirect('/?message=' + encodeURIComponent("Please enter a name"));
+			} else if (password.length === 0) {
+				response.redirect('/?message=' + encodeURIComponent("Please enter a password"));
+			} else if (user !== null && password.length !== 0) {
+				bcrypt.compare(password, user.password, function(err, passwordMatch) {
+					if (err) {
+						console.log("Error with bcrypt")
+					}
+					if (passwordMatch) {
+						request.session.user = user;
+						response.redirect('/user/page');
+					} else {
+						response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"))
+					}
+				})
+			}
+		},
+		function(error) {
+			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"));
+		});
 });
 
 // New User
-// To improve: figure out how to immediately login while registering, so that user page loads without logging in first
+// To improve: figure out how to immediately login while registering, so that user page loads without logging in first (check out flash storage?)
 
 app.post('/user/new', function(request, response) {
 	var user = request.session.user;
-	User.create({
-		name: request.body.name,
-		email: request.body.email,
-		password: request.body.password
-	}).then(function(user) {
-		response.redirect('/user/page');
-	}, function(error) {
-		response.redirect('/?message=' + encodeURIComponent("Name or email already in use, try something else!"));
+
+	bcrypt.hash(request.body.password, 8, function(err, passwordHash) {
+		if (err !== undefined) {
+			console.log(err);
+		}
+		if (request.body.name.length === 0 || request.body.email.length === 0 || request.body.password.length === 0) {
+			response.redirect('/?message=' + encodeURIComponent("Please enter a name, emailaddress and a password"));
+		} else {
+			User.create({
+				name: request.body.name,
+				email: request.body.email,
+				password: passwordHash
+			}).then(function(user) {
+					response.redirect('/user/page');
+				},
+				function(error) {
+					response.redirect('/?message=' + encodeURIComponent("Name or email already in use, try something else!"));
+				});
+		};
 	});
 });
 
@@ -239,7 +265,6 @@ app.get('/posts/:id', function(request, response) {
 							});
 							allComments = data.reverse();
 						}).then(function() {
-							console.log("before the loop")
 							for (comment in allComments) {
 								for (user in allUsers) {
 									if (allComments[comment].userId === allUsers[user].id) {
@@ -248,12 +273,11 @@ app.get('/posts/:id', function(request, response) {
 								}
 							}
 						}).then(function() {
-							console.log()
 							response.render('post', {
 								postId: postId,
 								post: post,
 								allComments: allComments,
-								comment: comment,
+								// comment: comment,
 								user: request.session.username,
 								user: request.session.user
 							});
