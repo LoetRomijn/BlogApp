@@ -2,8 +2,7 @@
 
  Blog Application NYCDA homework 
 
- // To improve: add comments counter under posts + add date + time of posts/comments. Encrypt passwords 
-
+ // To improve: add comments counter under posts + add date + time of posts/comments. 
 
 /////////////////////////////////////////////////*/
 
@@ -165,6 +164,7 @@ app.get('/user', function(request, response) {
 });
 
 // Login   
+// To improve: fix error 
 
 app.post('/login', function(request, response) {
 	var password = request.body.password;
@@ -180,6 +180,9 @@ app.post('/login', function(request, response) {
 				response.redirect('/?message=' + encodeURIComponent("Please enter a name"));
 			} else if (password.length === 0) {
 				response.redirect('/?message=' + encodeURIComponent("Please enter a password"));
+			// } else if (request.body.name || request.body.password = unknown){
+			// 	response.redirect('/?message=' + encodeURIComponent("Please register below before logging in"));
+			// }
 			} else if (user !== null && password.length !== 0) {
 				bcrypt.compare(password, user.password, function(err, passwordMatch) {
 					if (err) {
@@ -195,7 +198,7 @@ app.post('/login', function(request, response) {
 			}
 		},
 		function(error) {
-			response.redirect('/?message=' + encodeURIComponent("Name or Password incorrect, try again!"));
+			response.redirect('/?message=' + encodeURIComponent("An error occurred, try logging in again or register below"));
 		});
 });
 
@@ -277,7 +280,6 @@ app.get('/posts/:id', function(request, response) {
 								postId: postId,
 								post: post,
 								allComments: allComments,
-								// comment: comment,
 								user: request.session.username,
 								user: request.session.user
 							});
@@ -325,7 +327,7 @@ app.post('/newPost', function(request, response) {
 	});
 });
 
-// sync database, then start server 
+// Sync database, then start server 
 
 sequelize.sync().then(function() {
 	var server = app.listen(3000, function() {
