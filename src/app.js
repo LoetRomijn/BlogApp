@@ -3,10 +3,6 @@
  Blog Application NYCDA homework 
 
  // To improve: add comments counter under posts 
-
-Check: 
-Warning: missing space before text for line 27 of jade file "/home/loet/Documents/BSSAxNYCDA/Homework/BlogApp/BlogApp/src/views/post.jade"
-Warning: missing space before text for line 45 of jade file "/home/loet/Documents/BSSAxNYCDA/Homework/BlogApp/BlogApp/src/views/post.jade"
  
 /////////////////////////////////////////////////*/
 

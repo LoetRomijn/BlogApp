@@ -1,7 +1,9 @@
 doctype html
 html(lang="en")
 	head
-		link(rel='stylesheet', href='/style.css', type = 'text/css')  
+		link(rel='stylesheet', href='/style.css', type = 'text/css')
+		script(src='https://code.jquery.com/jquery-2.2.0.min.js')
+		script(type='text/javascript' src="../commentCount.js")
 	body
 		div.bodydiv
 		div.bodyTextdiv
@@ -24,7 +26,8 @@ html(lang="en")
 						br 
 						|	#{post.body}
 						br
-						p#date	#{post.timeStamp}
+						p#date #{post.timeStamp}
+						//- p#count 
 			div#columnright
 				h2 My posts:
 				each post in ownPosts
@@ -35,6 +38,7 @@ html(lang="en")
 						|	#{post.body}
 						br
 						p#date #{post.timeStamp}
+						//- p#count 
  
 
 	
