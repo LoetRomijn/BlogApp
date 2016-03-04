@@ -219,6 +219,45 @@ app.post('/user/new', function(request, response) {
 	});
 });
 
+// New post
+
+app.post('/posts/new', function(request, response) {
+	var user = request.session.user;
+
+	Post.create({
+		userId: user.id,
+		title: request.body.title,
+		body: request.body.body,
+		timeStamp: new Date()
+	}).then(function() {
+		response.redirect('/user/page');
+	});
+});
+
+// New comment
+
+app.post('/posts/:id/comments', function(request, response) {
+	var user = request.session.user.id;
+	var postId = request.params.id;
+
+	Comment.create({
+		include: [postId],
+		where: {
+			postId: postId
+		},
+
+		postId: request.params.id,
+		userId: request.session.user.id,
+		body: request.body.body,
+		timeStamp: new Date()
+	}).then(function(Comment) {
+		return {
+			Comment: Comment
+		}
+	});
+	response.redirect('/posts/' + postId);
+});
+
 // One Post + All Comments
 
 app.get('/posts/:id', function(request, response) {
@@ -263,44 +302,6 @@ app.get('/posts/:id', function(request, response) {
 	}
 });
 
-// New comment
-
-app.post('/posts/:id', function(request, response) {
-	var user = request.session.user.id;
-	var postId = request.params.id;
-
-	Comment.create({
-		include: [postId],
-		where: {
-			postId: postId
-		},
-
-		postId: request.params.id,
-		userId: request.session.user.id,
-		body: request.body.body,
-		timeStamp: new Date()
-	}).then(function(Comment) {
-		return {
-			Comment: Comment
-		}
-	});
-	response.redirect('/posts/' + postId);
-});
-
-// New post
-
-app.post('/newPost', function(request, response) {
-	var user = request.session.user;
-
-	Post.create({
-		userId: user.id,
-		title: request.body.title,
-		body: request.body.body,
-		timeStamp: new Date()
-	}).then(function() {
-		response.redirect('/user/page');
-	});
-});
 
 // Sync database, then start server 
 

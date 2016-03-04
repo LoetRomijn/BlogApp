@@ -28,7 +28,7 @@ html(lang='en')
 				br
 			h2 New comment
 			br
-			form(class= "form" name= "comment" action='/posts/#{onePost.id}' method='post')
+			form(class= "form" name= "comment" action='/posts/#{onePost.id}/comments' method='post')
 				label Comment
 				input(class= "comment" type="text" name ='body' placeholder="Your comment here...please be nice" autocomplete="off")
 				input(type='submit' value='Post') 
