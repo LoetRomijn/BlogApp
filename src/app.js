@@ -193,7 +193,6 @@ app.post('/login', function(request, response) {
 });
 
 // New User
-// To improve: figure out how to immediately login while registering, so that user page loads without logging in first (check out flash storage?)
 
 app.post('/user/new', function(request, response) {
 	var user = request.session.user;
@@ -209,6 +208,8 @@ app.post('/user/new', function(request, response) {
 				name: request.body.name,
 				email: request.body.email,
 				password: passwordHash
+			}).then(function(user) {
+				request.session.user = user;
 			}).then(function(user) {
 					response.redirect('/user/page');
 				},
